@@ -3,6 +3,10 @@
 
 ![jpg_1](./img/overall.jpg)
 
+(a) Whole Architecture
+(b) Transformer encoder layer
+(c) 2D Segment Detector
+
 ## **Environment**
   
 GeForce RTX 3090
