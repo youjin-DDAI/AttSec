@@ -1,7 +1,7 @@
 # **Protein Secondary Structure Prediction by capturing local patterns from attention map**
 
 
-![jpg_1](./img/overall.jpg)
+![jpg_1](./img/AttSec.jpg)
 
 (a) Whole Architecture
 (b) Transformer encoder layer
