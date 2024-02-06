@@ -334,8 +334,30 @@ class T5_seg_att_train_collate_fn(object):
 
         return batch_index, batch_seg_index, lengths, rep_pack, att_pack, batch_labels, batch_seg_label, mask
 
+def attention_padding(atts, lengths):
+    max_l = max(lengths)
+    frame = torch.zeros(len(atts), atts[0].size(0), max_l, max_l).cuda()
+    for i, att in enumerate(atts):
+        frame[i, :, :lengths[i], :lengths[i]] = att[:,:-1,:-1]
+
+    return frame
 
 
+def make_gt_seg(l, num_class):
+    l = nn.functional.one_hot(l, num_classes=num_class)
+    l = l.transpose(-1, -2)
+    l1 = l.unsqueeze(1)
+    l2 = l.unsqueeze(2)
+    l_ = l1 == l2
+    tril = torch.ones(num_class, l_.size(-1), l_.size(
+        -1)).tril().bool()  # torch.ones(7,l_.size(-1), l_.size(-1)).tril().bool().cuda()
+    consecutive = torch.cumprod((tril + l_).bool(), axis=-1)
+    l_upper = torch.triu(l.unsqueeze(-1).repeat(1, 1, l_.size(-1)) * consecutive)
+    l_mask = (l_upper + l_upper.transpose(-1, -2)).bool().int()
+    l_mask_all = l_mask.sum(dim=0)
+    no_interaction = (1-l_mask_all)*(num_class)
+    l_mask = torch.argmax(l_mask, dim=0)
+    l_mask += no_interaction
 
-
+    return l_mask
 
